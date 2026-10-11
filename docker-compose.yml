@@ -1,0 +1,113 @@
+
+services:
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: dc_mosquitto
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto_data:/mosquitto/data
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: dc_influxdb
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: dcproject2026pass
+      DOCKER_INFLUXDB_INIT_ORG: dc_project
+      DOCKER_INFLUXDB_INIT_BUCKET: energy
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: dc_project_dev_token_2026
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+      - influxdb_config:/etc/influxdb2
+
+  grafana:
+    image: grafana/grafana:11.6.0
+    container_name: dc_grafana
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: dcgrafana2026
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - influxdb
+
+  publisher_power:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: power_meter_01
+      ROOM: livingroom
+      SENSOR_TYPE: power
+      PUBLISH_INTERVAL: "1.0"
+      PUBLISH_QOS: "0"
+      SEED: "101"
+
+  publisher_thermostat:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: thermostat_01
+      ROOM: livingroom
+      SENSOR_TYPE: thermostat
+      PUBLISH_INTERVAL: "2.0"
+      PUBLISH_QOS: "0"
+      SEED: "102"
+
+  publisher_ambient:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: ambient_01
+      ROOM: kitchen
+      SENSOR_TYPE: ambient
+      PUBLISH_INTERVAL: "2.0"
+      PUBLISH_QOS: "0"
+      SEED: "103"
+
+  bridge:
+    build: ./bridge
+    container_name: dc_bridge
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+      - influxdb
+    environment:
+      MQTT_HOST: mosquitto
+      INFLUX_URL: http://influxdb:8086
+      INFLUX_ORG: dc_project
+      INFLUX_BUCKET: energy
+      INFLUXDB_TOKEN: ${INFLUXDB_TOKEN}
+    volumes:
+      - ./logs:/app/logs
+
+volumes:
+  mosquitto_data:
+  influxdb_data:
+  influxdb_config:
+  grafana_data:
