@@ -7,6 +7,10 @@ import time
 
 import paho.mqtt.client as mqtt
 
+LOG_EACH_PUBLISH = (
+    os.getenv("LOG_EACH_PUBLISH", "false").lower()
+    in ("1", "true")
+)
 
 # Configuration supplied by Docker Compose
 MQTT_HOST = os.getenv("MQTT_HOST", "mosquitto")
@@ -16,15 +20,50 @@ DEVICE_ID = os.environ["DEVICE_ID"]
 ROOM = os.environ["ROOM"]
 SENSOR_TYPE = os.environ["SENSOR_TYPE"].lower()
 
+LOAD_MODE = os.getenv("LOAD_MODE", "steady").lower()
+BURST_PERIOD = 60.0
+BURST_DURATION = 10.0
+BURST_MULTIPLIER = 5.0
+
+if LOAD_MODE not in ("steady", "bursty"):
+    raise ValueError("LOAD_MODE must be steady or bursty")
+
 INTERVAL = float(os.getenv("PUBLISH_INTERVAL", "1.0"))
 QOS = int(os.getenv("PUBLISH_QOS", "0"))
-SEED = int(os.getenv("SEED", "1"))
 
 if QOS not in (0, 1):
     raise ValueError("PUBLISH_QOS must be 0 or 1")
 
+DEVICE_INDEX = int(os.getenv("DEVICE_INDEX", "1"))
+RUN_SEED = int(os.getenv("RUN_SEED", "101"))
+
+SEED = int(
+    os.getenv("SEED", str(RUN_SEED + DEVICE_INDEX))
+)
+
 rng = random.Random(SEED)
 
+def wait_for_next_publish(run_start, next_deadline):
+    """
+    Maintain a publishing interval based on the current load mode. In bursty
+    mode, publish at BURST_MULTIPLIER times the base rate for BURST_DURATION
+    seconds every BURST_PERIOD seconds.
+    """
+    now = time.monotonic()
+
+    if LOAD_MODE == "bursty":
+        phase = (now - run_start) % BURST_PERIOD
+
+        if phase < BURST_DURATION:
+            interval = INTERVAL / BURST_MULTIPLIER
+        else:
+            interval = INTERVAL
+    else:
+        interval = INTERVAL
+
+    next_deadline += interval
+    time.sleep(max(0.0, next_deadline - time.monotonic()))
+    return next_deadline
 
 def connect_mqtt():
     """Connect to Mosquitto, retrying if the broker is not ready yet."""
@@ -129,16 +168,19 @@ class DevicePublisher:
             print(f"[{DEVICE_ID}] Publish failed: {result.rc}", flush=True)
             return
 
-        print(
-            f"[{DEVICE_ID}] topic={topic} seq={seq} "
-            f"payload_bytes={len(encoded)} qos={QOS}",
-            flush=True,
-        )
+        if LOG_EACH_PUBLISH:
+            print(
+                f"[{DEVICE_ID}] topic={topic} seq={seq} "
+                f"payload_bytes={len(encoded)} qos={QOS}",
+                flush=True,
+            )
 
 
 def run_power_meter(publisher):
     """Power meter: 1 message/s, 250-byte JSON payload."""
     sample = 0
+    run_start = time.monotonic()
+    next_deadline = run_start
 
     while True:
         watts = round(
@@ -156,13 +198,26 @@ def run_power_meter(publisher):
         )
 
         sample += 1
-        time.sleep(INTERVAL)
 
+        next_deadline = wait_for_next_publish(
+            run_start,
+            next_deadline
+        )
+
+def get_thermostat_state(temperature):
+    if temperature < 20.0:
+        return "heating"
+    elif temperature > 22.0:
+        return "cooling"
+    else:
+        return "idle"
 
 def run_thermostat(publisher):
     """Thermostat: temperature at 0.5 Hz and state on transitions."""
     sample = 0
     last_state = None
+    run_start = time.monotonic()
+    next_deadline = run_start
 
     while True:
         temperature = round(
@@ -178,7 +233,7 @@ def run_thermostat(publisher):
             unit="C",
         )
 
-        state = "heating" if temperature < 20.0 else "idle"
+        state = get_thermostat_state(temperature)
 
         # Publish the initial state, then every subsequent state change.
         if state != last_state:
@@ -186,11 +241,16 @@ def run_thermostat(publisher):
             last_state = state
 
         sample += 1
-        time.sleep(INTERVAL)
+        next_deadline = wait_for_next_publish(
+            run_start,
+            next_deadline
+        )
 
 
 def run_ambient_sensor(publisher):
     """Ambient sensor: 0.5 messages/s, 100-byte JSON payload."""
+    run_start = time.monotonic()
+    next_deadline = run_start
     while True:
         humidity = round(45 + rng.uniform(-4, 4), 1)
 
@@ -200,7 +260,10 @@ def run_ambient_sensor(publisher):
             target_bytes=100,
         )
 
-        time.sleep(INTERVAL)
+        next_deadline = wait_for_next_publish(
+            run_start,
+            next_deadline
+        )
 
 
 def main():

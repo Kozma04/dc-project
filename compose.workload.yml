@@ -1,0 +1,211 @@
+services:
+  workload_power_meter_01:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: "no"
+    depends_on:
+      - mosquitto
+    cap_add:
+      - NET_ADMIN
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: power_meter_01
+      DEVICE_INDEX: "1"
+      RUN_SEED: "${RUN_SEED:-101}"
+      ROOM: livingroom
+      SENSOR_TYPE: power
+      PUBLISH_INTERVAL: "1.0"
+      PUBLISH_QOS: "${PUBLISH_QOS:-0}"
+      LOAD_MODE: "${LOAD_MODE:-steady}"
+      LOG_EACH_PUBLISH: "${LOG_EACH_PUBLISH:-false}"
+
+  workload_power_meter_02:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: "no"
+    depends_on:
+      - mosquitto
+    cap_add:
+      - NET_ADMIN
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: power_meter_02
+      DEVICE_INDEX: "2"
+      RUN_SEED: "${RUN_SEED:-101}"
+      ROOM: bedroom
+      SENSOR_TYPE: power
+      PUBLISH_INTERVAL: "1.0"
+      PUBLISH_QOS: "${PUBLISH_QOS:-0}"
+      LOAD_MODE: "${LOAD_MODE:-steady}"
+      LOG_EACH_PUBLISH: "${LOG_EACH_PUBLISH:-false}"
+
+  workload_power_meter_03:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: "no"
+    depends_on:
+      - mosquitto
+    cap_add:
+      - NET_ADMIN
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: power_meter_03
+      DEVICE_INDEX: "3"
+      RUN_SEED: "${RUN_SEED:-101}"
+      ROOM: kitchen
+      SENSOR_TYPE: power
+      PUBLISH_INTERVAL: "1.0"
+      PUBLISH_QOS: "${PUBLISH_QOS:-0}"
+      LOAD_MODE: "${LOAD_MODE:-steady}"
+      LOG_EACH_PUBLISH: "${LOG_EACH_PUBLISH:-false}"
+
+  workload_power_meter_04:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: "no"
+    depends_on:
+      - mosquitto
+    cap_add:
+      - NET_ADMIN
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: power_meter_04
+      DEVICE_INDEX: "4"
+      RUN_SEED: "${RUN_SEED:-101}"
+      ROOM: livingroom
+      SENSOR_TYPE: power
+      PUBLISH_INTERVAL: "1.0"
+      PUBLISH_QOS: "${PUBLISH_QOS:-0}"
+      LOAD_MODE: "${LOAD_MODE:-steady}"
+      LOG_EACH_PUBLISH: "${LOG_EACH_PUBLISH:-false}"
+
+  workload_thermostat_01:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: "no"
+    depends_on:
+      - mosquitto
+    cap_add:
+      - NET_ADMIN
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: thermostat_01
+      DEVICE_INDEX: "5"
+      RUN_SEED: "${RUN_SEED:-101}"
+      ROOM: livingroom
+      SENSOR_TYPE: thermostat
+      PUBLISH_INTERVAL: "2.0"
+      PUBLISH_QOS: "${PUBLISH_QOS:-0}"
+      LOAD_MODE: "${LOAD_MODE:-steady}"
+      LOG_EACH_PUBLISH: "${LOG_EACH_PUBLISH:-false}"
+
+  workload_thermostat_02:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: "no"
+    depends_on:
+      - mosquitto
+    cap_add:
+      - NET_ADMIN
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: thermostat_02
+      DEVICE_INDEX: "6"
+      RUN_SEED: "${RUN_SEED:-101}"
+      ROOM: bedroom
+      SENSOR_TYPE: thermostat
+      PUBLISH_INTERVAL: "2.0"
+      PUBLISH_QOS: "${PUBLISH_QOS:-0}"
+      LOAD_MODE: "${LOAD_MODE:-steady}"
+      LOG_EACH_PUBLISH: "${LOG_EACH_PUBLISH:-false}"
+
+  workload_thermostat_03:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: "no"
+    depends_on:
+      - mosquitto
+    cap_add:
+      - NET_ADMIN
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: thermostat_03
+      DEVICE_INDEX: "7"
+      RUN_SEED: "${RUN_SEED:-101}"
+      ROOM: kitchen
+      SENSOR_TYPE: thermostat
+      PUBLISH_INTERVAL: "2.0"
+      PUBLISH_QOS: "${PUBLISH_QOS:-0}"
+      LOAD_MODE: "${LOAD_MODE:-steady}"
+      LOG_EACH_PUBLISH: "${LOG_EACH_PUBLISH:-false}"
+
+  workload_ambient_01:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: "no"
+    depends_on:
+      - mosquitto
+    cap_add:
+      - NET_ADMIN
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: ambient_01
+      DEVICE_INDEX: "8"
+      RUN_SEED: "${RUN_SEED:-101}"
+      ROOM: livingroom
+      SENSOR_TYPE: ambient
+      PUBLISH_INTERVAL: "2.0"
+      PUBLISH_QOS: "${PUBLISH_QOS:-0}"
+      LOAD_MODE: "${LOAD_MODE:-steady}"
+      LOG_EACH_PUBLISH: "${LOG_EACH_PUBLISH:-false}"
+
+  workload_ambient_02:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: "no"
+    depends_on:
+      - mosquitto
+    cap_add:
+      - NET_ADMIN
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: ambient_02
+      DEVICE_INDEX: "9"
+      RUN_SEED: "${RUN_SEED:-101}"
+      ROOM: bedroom
+      SENSOR_TYPE: ambient
+      PUBLISH_INTERVAL: "2.0"
+      PUBLISH_QOS: "${PUBLISH_QOS:-0}"
+      LOAD_MODE: "${LOAD_MODE:-steady}"
+      LOG_EACH_PUBLISH: "${LOG_EACH_PUBLISH:-false}"
+
+  workload_ambient_03:
+    build: ./publishers
+    image: dc-project-publisher:local
+    restart: "no"
+    depends_on:
+      - mosquitto
+    cap_add:
+      - NET_ADMIN
+    environment:
+      MQTT_HOST: mosquitto
+      MQTT_PORT: "1883"
+      DEVICE_ID: ambient_03
+      DEVICE_INDEX: "10"
+      RUN_SEED: "${RUN_SEED:-101}"
+      ROOM: kitchen
+      SENSOR_TYPE: ambient
+      PUBLISH_INTERVAL: "2.0"
+      PUBLISH_QOS: "${PUBLISH_QOS:-0}"
+      LOAD_MODE: "${LOAD_MODE:-steady}"
+      LOG_EACH_PUBLISH: "${LOG_EACH_PUBLISH:-false}"
+
