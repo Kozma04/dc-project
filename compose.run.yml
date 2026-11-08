@@ -1,0 +1,5 @@
+# Extra compose file: gives the bridge the RUN_ID so each run writes logs/messages_<RUN_ID>.csv
+services:
+  bridge:
+    environment:
+      RUN_ID: "${RUN_ID:-}"

@@ -1,0 +1,5 @@
+.env
+Anaconda3-.sh
+.pcap
+.venv/
+_pycache_/
