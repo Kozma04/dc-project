@@ -1,0 +1,42 @@
+---- workload_thermostat_03 ----
+qdisc netem 8030: root refcnt 17 limit 1000 delay 20ms  5ms loss 1% seed 9835352011688877074
+ Sent 26358 bytes 146 pkt (dropped 1, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+---- workload_ambient_03 ----
+qdisc netem 802b: root refcnt 17 limit 1000 delay 20ms  5ms loss 1% seed 9185449501751130501
+ Sent 22869 bytes 126 pkt (dropped 1, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+---- workload_thermostat_02 ----
+qdisc netem 802c: root refcnt 17 limit 1000 delay 20ms  5ms loss 1% seed 13602468443284147426
+ Sent 26358 bytes 146 pkt (dropped 2, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+---- workload_power_meter_02 ----
+qdisc netem 8032: root refcnt 17 limit 1000 delay 20ms  5ms loss 1% seed 16987436763072430902
+ Sent 76154 bytes 230 pkt (dropped 2, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+---- workload_ambient_02 ----
+qdisc netem 802a: root refcnt 17 limit 1000 delay 20ms  5ms loss 1% seed 9605888626517038032
+ Sent 22869 bytes 126 pkt (dropped 0, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+---- workload_power_meter_01 ----
+qdisc netem 8031: root refcnt 17 limit 1000 delay 20ms  5ms loss 1% seed 5130865485932423513
+ Sent 77147 bytes 231 pkt (dropped 2, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+---- workload_power_meter_03 ----
+qdisc netem 802f: root refcnt 17 limit 1000 delay 20ms  5ms loss 1% seed 11721020578717628123
+ Sent 76550 bytes 232 pkt (dropped 2, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+---- workload_thermostat_01 ----
+qdisc netem 802d: root refcnt 17 limit 1000 delay 20ms  5ms loss 1% seed 17464119634494374240
+ Sent 26901 bytes 146 pkt (dropped 1, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+---- workload_ambient_01 ----
+qdisc netem 802e: root refcnt 17 limit 1000 delay 20ms  5ms loss 1% seed 3163081978917783010
+ Sent 23190 bytes 126 pkt (dropped 3, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+---- workload_power_meter_04 ----
+qdisc netem 8029: root refcnt 17 limit 1000 delay 20ms  5ms loss 1% seed 15669544899291304021
+ Sent 78260 bytes 235 pkt (dropped 1, overlimits 0 requeues 0) 
+ backlog 0b 0p requeues 0
+
+Summary: processed=10 skipped_not_running=0 failed=0

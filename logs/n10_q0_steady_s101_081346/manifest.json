@@ -1,0 +1,4 @@
+{"run_id":"n10_q0_steady_s101_081346","publishers":10,"qos":0,"load":"steady",
+ "run_seed":101,"settle_s":10,"duration_s":10,
+ "netem":"delay 20ms 5ms loss random 1% (scripts/netem.sh)",
+ "date":"2026-11-09T08:13:46+02:00","docker":"Docker version 29.1.3, build 29.1.3-0ubuntu3~24.04.2","git":"df3a1c8"}

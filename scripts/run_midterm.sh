@@ -6,6 +6,35 @@
 set -Eeuo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
+# Select ONE host Python interpreter for all analysis steps.
+# Prefer an explicitly selected interpreter, then an active virtual/Conda
+# environment, then this repository's .venv, then python3 on PATH.
+if [[ -n "${PYTHON_BIN:-}" ]]; then
+    :
+elif [[ -n "${VIRTUAL_ENV:-}" || -n "${CONDA_PREFIX:-}" ]]; then
+    PYTHON_BIN="$(command -v python || true)"
+elif [[ -x .venv/bin/python ]]; then
+    PYTHON_BIN="$PWD/.venv/bin/python"
+else
+    PYTHON_BIN="$(command -v python3 || command -v python || true)"
+fi
+
+if [[ -z "$PYTHON_BIN" ]]; then
+    echo "ERROR: No Python executable found for analysis." >&2
+    echo "Create/activate a virtual environment first." >&2
+    exit 1
+fi
+
+# Fail BEFORE starting Docker, tcpdump or publishers if dependencies are missing.
+if ! "$PYTHON_BIN" -c 'import pandas, numpy, matplotlib' >/dev/null 2>&1; then
+    echo "ERROR: Analysis dependencies missing for: $PYTHON_BIN" >&2
+    echo "Install them into THAT interpreter with:" >&2
+    echo "  "$PYTHON_BIN" -m pip install -r analysis/requirements.txt" >&2
+    exit 1
+fi
+
+echo ">> analysis interpreter: $("$PYTHON_BIN" -c 'import sys; print(sys.executable)')"
+
 export RUN_SEED=${RUN_SEED:-101}
 export PUBLISH_QOS=${PUBLISH_QOS:-0}
 export LOAD_MODE=${LOAD_MODE:-steady}
@@ -47,7 +76,7 @@ scripts/capture.sh stop "$OUT"
 "${COMPOSE[@]}" rm -sf $WORKLOADS            # removes containers => netem state disappears too
 
 echo ">> analysis"
-python analysis/kpi.py "$CSV" --settle "$SETTLE" --duration "$DURATION"
-python analysis/plot.py "$CSV" --settle "$SETTLE" --duration "$DURATION"
-python analysis/traffic.py "$CSV" || echo "(traffic.py failed - is tshark installed?)"
+"$PYTHON_BIN" analysis/kpi.py "$CSV" --settle "$SETTLE" --duration "$DURATION"
+"$PYTHON_BIN" analysis/plot.py "$CSV" --settle "$SETTLE" --duration "$DURATION"
+"$PYTHON_BIN" analysis/traffic.py "$CSV" || echo "(traffic.py failed - is tshark installed?)"
 echo ">> results are in logs/ (messages_${RUN_ID}.csv, *_kpi.csv, *_latency_p50_p95.png, *_traffic.csv)"
